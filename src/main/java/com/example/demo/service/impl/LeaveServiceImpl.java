@@ -30,6 +30,7 @@ public class LeaveServiceImpl implements LeaveService {
 		leaveInfo.setLeaveMsg(msg);
 		String id = UUID.randomUUID().toString();
 		leaveInfo.setId(id);
+		leaveInfo.setStatus("0");
 		//新增一条记录至数据库中
 		leaveMapper.insert(leaveInfo);
 		//启动流程引擎
@@ -39,13 +40,17 @@ public class LeaveServiceImpl implements LeaveService {
 	@Override
 	public List<LeaveInfo> getByUserId(String userId) {
 		ArrayList<LeaveInfo> leaveInfoList = new ArrayList<>();
+		//这是查询的ACT_RU_TESK表
 		List<Task> list = testLeaveService.findTaskByUserId(userId);
 		for (Task task : list) {
-			ProcessInstance result = runtimeService.createProcessInstanceQuery().processInstanceId(task.getProcessInstanceId()).singleResult();
-			//获得业务流程的bussinessKey
+			ProcessInstance result = runtimeService
+									.createProcessInstanceQuery()
+									.processInstanceId(task.getProcessInstanceId()).singleResult();
+			//获得业务流程的bussinessKey 就是 业务表中申请信息的id
 			String businessKey = result.getBusinessKey();
 			LeaveInfo leaveInfo = leaveMapper.getById(businessKey);
 			leaveInfo.setTaskId(task.getId());
+			//这边并没有将taskid存入到业务表中
 			leaveInfoList.add(leaveInfo);
 		}
 		return leaveInfoList;
@@ -55,5 +60,12 @@ public class LeaveServiceImpl implements LeaveService {
 	public void completeTaskByUser(String taskId, String userId, String audit) {
 		testLeaveService.completeTaskByUser(taskId, userId, audit);
 	}
+
+
+	@Override
+	public void claimTaskBytaskIdAndUserId(String taskId, String userId, String audit) {
+		testLeaveService.claimTaskBytaskIdAndUserId(taskId, userId, audit);
+	}
+
 
 }
