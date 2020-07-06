@@ -14,6 +14,7 @@
 
 	<insert id="insert">
 		insert into leave_info
+		(id,leave_msg,status)
 		values(
 			#{id},#{leaveMsg},#{status}
 		)

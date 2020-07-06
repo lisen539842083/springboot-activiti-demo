@@ -25,4 +25,13 @@ public interface LeaveService {
 	 * @param audit
 	 */
 	void completeTaskByUser(String taskId,String userId,String audit);
+
+	/**
+	 * 任务认领
+	 * @param taskId
+	 * @param userId
+	 * @param audit
+	 */
+	void claimTaskBytaskIdAndUserId(String taskId,String userId,String audit);
+
 }

@@ -6,6 +6,7 @@ import java.io.InputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.example.demo.base.BaseController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +18,7 @@ import com.example.demo.service.LeaveService;
 import com.example.demo.service.TestLeaveService;
 
 @RestController
-public class LeaveController {
+public class LeaveController extends BaseController {
 
     private static final Logger logger = LoggerFactory.getLogger(LeaveController.class);
     @Autowired
@@ -39,7 +40,7 @@ public class LeaveController {
 
     /**
      * 查询当前用户的任务列表
-     *
+     * project1 或者 project2
      * @param userId
      * @param request
      * @return
@@ -64,6 +65,22 @@ public class LeaveController {
         leaveService.completeTaskByUser(taskId, userId, audit);
         return "审批完成...";
     }
+
+    /**
+     * 认领任务
+     * audit不需要
+     * @param taskId
+     * @param userId
+     * @param audit
+     * @param request
+     * @return
+     */
+    @RequestMapping("/claimTaskBytaskIdAndUserId")
+    public String claimTaskBytaskIdAndUserId(String taskId, String userId, String audit, HttpServletRequest request) {
+        leaveService.claimTaskBytaskIdAndUserId(taskId, userId, audit);
+        return "认领任务完成...";
+    }
+
 
 
     @RequestMapping("/showImg")

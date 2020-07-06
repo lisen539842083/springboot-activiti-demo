@@ -25,8 +25,10 @@ public class TestLeaveService {
 
 	@Autowired
 	private LeaveMapper leaveMapper;
+
 	@Autowired
 	private RuntimeService runtimeService;
+
 	@Autowired
 	private TaskService taskService;
 	
@@ -65,18 +67,37 @@ public class TestLeaveService {
 	 public void completeTaskByUser(String taskId,String userId,String audit) {
 		 Map<String, Object> map = new HashMap<>();
 		 //1、认领任务
-		 taskService.claim(taskId, userId);
-		//2.完成任务
+//		 taskService.claim(taskId, userId);
+		 //2.完成任务
+		 //这边设置成map是因为可能流程图传多个参数
 		 map.put("audit",audit);
 		 taskService.complete(taskId, map);
 	 }
+
+
+	/**
+	 * 任务认领
+	 * @param taskId 审批的任务id
+	 * @param userId 审批人的id
+	 * @param audit  审批意见：通过（pass）or驳回（reject）
+	 */
+	public void claimTaskBytaskIdAndUserId(String taskId,String userId,String audit) {
+		Map<String, Object> map = new HashMap<>();
+		//1、认领任务
+		//ACT_RU_TASK修改了 ASSIGNEE_ 属性为userId
+		taskService.claim(taskId, userId);
+		//2.完成任务
+//		map.put("audit",audit);
+//		taskService.complete(taskId, map);
+	}
 	
 	/**
+	 * bpmn中执行用户是执行这个方法 则用户id是这这个放回的数组
 	 * 查询相关的项目经理
 	 * @param execution 执行实例的代理对象 ,代表的是一个请假的具体实例
 	 * @return
 	 */
-	public List<String> findProjectManager(DelegateExecution execution) {
+	public List<String> findProjectManager(DelegateExecution execution){
 		return Arrays.asList("project1","project2");
 	}
 	
@@ -93,13 +114,11 @@ public class TestLeaveService {
 	 * 修改请假单的状态
 	 */
 	public void changeStatus(DelegateExecution execution,String status) {
-		
 		String key = execution.getProcessBusinessKey();
 		//LeaveInfo entity = new LeaveInfo();
 		LeaveInfo entity = leaveMapper.getById(key);
 		entity.setStatus(status);
 		leaveMapper.update(entity);
-		
 	//	System.out.println("修改请假单状态为：" + status);
 		
 	}
@@ -110,7 +129,6 @@ public class TestLeaveService {
 	 * @return
 	 */
 	public boolean queryProcessIsEnd(String processInstanceId){
-		
 		HistoricProcessInstance result = historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
 		if(result != null && result.getStartTime() != null && result.getEndTime() != null) {
 			return true;
@@ -123,9 +141,7 @@ public class TestLeaveService {
 		ProcessDefinitionEntity entity = findProcessDefinitionEntityByTaskId(taskId);
 		//ProcessDiagramGenerator.generateDiagram
 		InputStream imageStream = ProcessDiagramGenerator.generateDiagram(entity, "png", runtimeService.getActiveActivityIds(findProcessInstanceByTaskId(taskId).getId()));
-
 		return null;
-		
 	}
 	
 	

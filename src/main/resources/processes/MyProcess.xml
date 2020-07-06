@@ -10,8 +10,7 @@
     <userTask activiti:candidateUsers="${leaveService.findHrManager(execution)}" activiti:exclusive="true" id="usertask2" name="人事经理审批"/>
     <sequenceFlow id="flow3" name="同意" sourceRef="reviewDecision" targetRef="usertask2">
       <conditionExpression xsi:type="tFormalExpression">
-        <![CDATA[
-        ]]>
+        <![CDATA[${audit=='pass'}]]>
       </conditionExpression>
     </sequenceFlow>
     <exclusiveGateway gatewayDirection="Unspecified" id="exclusivegateway1" name="Exclusive Gateway"/>
@@ -19,8 +18,7 @@
     <serviceTask activiti:exclusive="true" activiti:expression="#{leaveService.changeStatus(execution,'pass')}" id="servicetask2" name="修改请假单状态（pass）"/>
     <sequenceFlow id="flow5" name="同意" sourceRef="exclusivegateway1" targetRef="servicetask2">
       <conditionExpression xsi:type="tFormalExpression">
-        <![CDATA[
-        ]]>
+        <![CDATA[${audit=='pass'}]]>
       </conditionExpression>
     </sequenceFlow>
     <endEvent id="endevent1" name="End"/>
@@ -28,14 +26,12 @@
     <serviceTask activiti:exclusive="true" activiti:expression="#{leaveService.changeStatus(execution,'reject')}" id="servicetask3" name="修改请假单状态（reject）"/>
     <sequenceFlow id="flow7" name="拒绝" sourceRef="reviewDecision" targetRef="servicetask3">
       <conditionExpression xsi:type="tFormalExpression">
-        <![CDATA[
-        ]]>
+        <![CDATA[${audit=='reject'}]]>
       </conditionExpression>
     </sequenceFlow>
     <sequenceFlow id="flow8" name="拒绝" sourceRef="exclusivegateway1" targetRef="servicetask3">
       <conditionExpression xsi:type="tFormalExpression">
-        <![CDATA[
-        ]]>
+        <![CDATA[${audit=='reject'}]]>
       </conditionExpression>
     </sequenceFlow>
     <sequenceFlow id="flow9" sourceRef="servicetask3" targetRef="endevent1"/>
